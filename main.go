@@ -11,20 +11,34 @@ type ContohReq struct {
 	Nama string `json:"name"`
 }
 
+func readRequest(s interface{}, r *http.Request) error {
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(b, s)
+}
+
+func HandleUserPost(w http.ResponseWriter, r *http.Request) {
+	var contoh ContohReq
+
+	err := readRequest(&contoh, r)
+	if err != nil {
+		w.Write([]byte("error"))
+	}
+
+	msg := fmt.Sprintf("Nama User : %s", contoh.Nama)
+	w.Write([]byte(msg))
+}
+
 func HandlePost(w http.ResponseWriter, r *http.Request) {
 
 	var contoh ContohReq
 
-	b, err := ioutil.ReadAll(r.Body)
+	err := readRequest(&contoh, r)
 	if err != nil {
 		w.Write([]byte("error"))
-		return
-	}
-
-	err = json.Unmarshal(b, &contoh)
-	if err != nil {
-		w.Write([]byte("error unmarshal"))
-		return
 	}
 
 	msg := fmt.Sprintf("Nama : %s", contoh.Nama)
